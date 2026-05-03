@@ -4,6 +4,14 @@ SvelteKit 製のフロントエンド。プロジェクト概要は[ルートの
 
 ## 開発
 
+`src/lib/svelteutils` は git submodule なので、未取得なら先に初期化:
+
+```sh
+git submodule update --init --recursive
+```
+
+その後:
+
 ```sh
 pnpm install
 pnpm dev

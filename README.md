@@ -36,6 +36,20 @@
 
 ## 開発
 
+`src/lib/svelteutils` は git submodule なので、初回クローン時は recurse-submodules する:
+
+```sh
+git clone --recurse-submodules https://github.com/ytyng/mouse-pointer-accuracy.git
+```
+
+既にクローン済みの場合:
+
+```sh
+git submodule update --init --recursive
+```
+
+その後:
+
 ```sh
 cd frontend
 pnpm install
