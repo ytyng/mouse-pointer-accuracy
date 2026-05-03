@@ -1,0 +1,210 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
+	import { listPatterns } from '$lib/patterns';
+	import { listResults, deleteResult, clearAll } from '$lib/storage';
+	import { toJSON, toTSV, toMarkdown, download, fmtSec, fmtDateTime } from '$lib/export';
+	import { i18nKit } from '$lib/i18n';
+	import { humanReadableTime } from '$lib/svelteutils/time';
+	import type { TestResult } from '$lib/types';
+
+	const { _, lang } = i18nKit();
+
+	const patterns = listPatterns();
+	let results = $state<TestResult[]>([]);
+	let selectedPatternFilter = $state<string>('all');
+
+	onMount(() => {
+		results = listResults();
+	});
+
+	const filteredResults = $derived(
+		selectedPatternFilter === 'all'
+			? results
+			: results.filter((r) => r.patternId === selectedPatternFilter)
+	);
+
+	function refresh() {
+		results = listResults();
+	}
+
+	function onDelete(id: string, name: string) {
+		if (!confirm(_(`「${name}」を削除しますか?`, `Delete "${name}"?`))) return;
+		deleteResult(id);
+		refresh();
+	}
+
+	function onClearAll() {
+		if (!confirm(_('全ての記録を削除しますか?', 'Delete all records?'))) return;
+		clearAll();
+		refresh();
+	}
+
+	function ts(): string {
+		return new Date().toISOString().replace(/[:.]/g, '-');
+	}
+
+	function exportJSON() {
+		download(`mpa-records-${ts()}.json`, 'application/json', toJSON(filteredResults));
+	}
+	function exportTSV() {
+		download(`mpa-records-${ts()}.tsv`, 'text/tab-separated-values', toTSV(filteredResults));
+	}
+	function exportMD() {
+		download(`mpa-records-${ts()}.md`, 'text/markdown', toMarkdown(filteredResults));
+	}
+
+	function exportSingle(r: TestResult, kind: 'json' | 'tsv' | 'md') {
+		const stem = `mpa-${r.patternId}-${r.name}-${ts()}`;
+		if (kind === 'json') download(`${stem}.json`, 'application/json', toJSON([r]));
+		if (kind === 'tsv') download(`${stem}.tsv`, 'text/tab-separated-values', toTSV([r]));
+		if (kind === 'md') download(`${stem}.md`, 'text/markdown', toMarkdown([r]));
+	}
+</script>
+
+<div class="mx-auto max-w-5xl p-8">
+	<header class="mb-8">
+		<h1 class="text-3xl font-bold">Mouse Pointer Accuracy</h1>
+		<p class="text-slate-500 mt-1">
+			{_(
+				'マウスポインタの精度・速度を計測する。',
+				'Measure mouse pointer accuracy and speed.'
+			)}
+		</p>
+	</header>
+
+	<section class="mb-12">
+		<h2 class="text-xl font-semibold mb-4">{_('テストパターン', 'Test patterns')}</h2>
+		<ul class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+			{#each patterns as p (p.id)}
+				<li class="border border-slate-200 rounded-lg p-4 hover:border-slate-400 transition bg-slate-50">
+					<a href={resolve('/test/[pattern]', { pattern: p.id })} class="block">
+						<div class="font-mono text-xs text-slate-400">{p.id}</div>
+						<div class="font-semibold mt-0.5">{p.name}</div>
+						<div class="text-sm text-slate-600 mt-2">{p.description}</div>
+						<div class="text-xs text-slate-500 mt-3">
+							{_('ワークエリア', 'Work area')} {p.workWidth}×{p.workHeight} /
+							{_('ターゲット', 'Targets')} {p.targets.length} /
+							{_('クリック数', 'Clicks')} {p.sequence.length}
+						</div>
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</section>
+
+	<section>
+		<div class="flex items-center justify-between mb-4">
+			<h2 class="text-xl font-semibold">
+				{_('記録', 'Records')} ({filteredResults.length})
+			</h2>
+			<div class="flex items-center gap-2">
+				<select
+					bind:value={selectedPatternFilter}
+					class="border border-slate-300 rounded px-2 py-1 text-sm"
+				>
+					<option value="all">{_('すべてのパターン', 'All patterns')}</option>
+					{#each patterns as p (p.id)}
+						<option value={p.id}>{p.name}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+		{#if filteredResults.length === 0}
+			<p class="text-slate-500 text-sm">
+				{_(
+					'まだ記録がありません。テストパターンを選んで計測してください。',
+					'No records yet. Pick a pattern and run a test.'
+				)}
+			</p>
+		{:else}
+			<div class="flex gap-2 mb-3">
+				<button
+					onclick={exportJSON}
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
+					>{_('JSON 一括', 'Export JSON')}</button
+				>
+				<button
+					onclick={exportTSV}
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
+					>{_('TSV 一括', 'Export TSV')}</button
+				>
+				<button
+					onclick={exportMD}
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
+					>{_('Markdown 一括', 'Export Markdown')}</button
+				>
+				<div class="flex-1"></div>
+				<button
+					onclick={onClearAll}
+					class="bg-red-600 text-white text-sm px-3 py-1.5 rounded hover:bg-red-700"
+					>{_('全削除', 'Delete all')}</button
+				>
+			</div>
+
+			<div class="overflow-x-auto">
+				<table class="w-full text-sm border-collapse">
+					<thead class="text-left text-slate-500 border-b border-slate-300">
+						<tr>
+							<th class="py-2 pr-3">{_('名前', 'Name')}</th>
+							<th class="py-2 pr-3">{_('パターン', 'Pattern')}</th>
+							<th class="py-2 pr-3 text-right">{_('スコア', 'Score')}</th>
+							<th class="py-2 pr-3 text-right">{_('時間(秒)', 'Time (s)')}</th>
+							<th class="py-2 pr-3 text-right">{_('ミス数', 'Misses')}</th>
+							<th class="py-2 pr-3 text-right">{_('ミス率', 'Miss rate')}</th>
+							<th class="py-2 pr-3 text-right">{_('平均間隔(秒)', 'Avg int. (s)')}</th>
+							<th class="py-2 pr-3">{_('日時', 'Date')}</th>
+							<th class="py-2 pr-3"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredResults as r (r.id)}
+							<tr class="border-b border-slate-100">
+								<td class="py-2 pr-3 font-medium">{r.name}</td>
+								<td class="py-2 pr-3 text-slate-600">{r.patternName}</td>
+								<td class="py-2 pr-3 text-right tabular-nums font-semibold text-emerald-700"
+									>{r.score?.toFixed(2) ?? '-'}</td
+								>
+								<td class="py-2 pr-3 text-right tabular-nums">{fmtSec(r.totalMs)}</td>
+								<td class="py-2 pr-3 text-right tabular-nums">{r.missClicks}</td>
+								<td class="py-2 pr-3 text-right tabular-nums"
+									>{(r.missRate * 100).toFixed(2)}%</td
+								>
+								<td class="py-2 pr-3 text-right tabular-nums">{fmtSec(r.avgIntervalMs)}</td>
+								<td class="py-2 pr-3 text-slate-500 text-xs">
+									<div>{fmtDateTime(r.createdAt)}</div>
+									<div class="text-slate-400">{humanReadableTime(new Date(r.createdAt).getTime(), lang)}</div>
+								</td>
+								<td class="py-2 pr-3">
+									<div class="flex gap-1 justify-end">
+										<button
+											onclick={() => exportSingle(r, 'json')}
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
+											>JSON</button
+										>
+										<button
+											onclick={() => exportSingle(r, 'tsv')}
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
+											>TSV</button
+										>
+										<button
+											onclick={() => exportSingle(r, 'md')}
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
+											>MD</button
+										>
+										<button
+											onclick={() => onDelete(r.id, r.name)}
+											class="text-xs px-2 py-1 border border-red-300 text-red-600 rounded hover:bg-red-50"
+											>{_('削除', 'Delete')}</button
+										>
+									</div>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+	</section>
+</div>
