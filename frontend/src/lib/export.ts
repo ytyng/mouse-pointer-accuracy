@@ -72,12 +72,14 @@ export function toTSV(results: TestResult[]): string {
 					sanitizeTsvCell(r.patternId),
 					sanitizeTsvCell(r.patternName),
 					sanitizeTsvCell(r.createdAt),
-					(r.score ?? 0).toFixed(2),
+					// score は旧レコードでは未定義の可能性があるため空セルにする (0 と区別)
+					r.score == null ? '' : r.score.toFixed(2),
 					fmtMs(r.totalMs),
 					String(r.totalClicks),
 					String(r.hitClicks),
 					String(r.missClicks),
-					(r.missRate * 100).toFixed(4),
+					// miss_rate は 0-1 のレシオで内部値・JSON と統一
+					r.missRate.toFixed(6),
 					fmtMs(r.avgIntervalMs),
 					String(i),
 					String(c.targetId),
@@ -104,7 +106,7 @@ export function toMarkdown(results: TestResult[]): string {
 			`- **Pattern**: ${sanitizeMdInline(r.patternName)} (\`${sanitizeMdInline(r.patternId)}\`)`
 		);
 		out.push(`- **Created**: ${fmtDateTime(r.createdAt)}`);
-		out.push(`- **Score**: ${(r.score ?? 0).toFixed(2)}`);
+		out.push(`- **Score**: ${r.score == null ? '-' : r.score.toFixed(2)}`);
 		out.push(`- **Total time**: ${fmtSec(r.totalMs)} s`);
 		out.push(`- **Clicks**: ${r.totalClicks} (hit ${r.hitClicks} / miss ${r.missClicks})`);
 		out.push(`- **Miss rate**: ${fmtPct(r.missRate)}`);

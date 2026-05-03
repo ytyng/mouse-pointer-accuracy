@@ -1,4 +1,5 @@
 import type { TestResult } from './types';
+import { i18nKit } from './i18n';
 
 const KEY = 'mpa.results.v1';
 
@@ -22,7 +23,9 @@ function isValidResult(r: unknown): r is TestResult {
 	const o = r as Record<string, unknown>;
 	if (
 		typeof o.id !== 'string' ||
+		typeof o.name !== 'string' ||
 		typeof o.patternId !== 'string' ||
+		typeof o.patternName !== 'string' ||
 		typeof o.createdAt !== 'string' ||
 		typeof o.totalMs !== 'number' ||
 		typeof o.totalClicks !== 'number' ||
@@ -34,7 +37,9 @@ function isValidResult(r: unknown): r is TestResult {
 	) {
 		return false;
 	}
-	// clicks の各要素も型を検証 (export 時の .toFixed() で throw しないため)
+	// score は optional なので、存在する場合のみ number チェック
+	if (o.score !== undefined && typeof o.score !== 'number') return false;
+	// clicks の各要素も型を検証 (export 時の .toFixed() 等で throw しないため)
 	return o.clicks.every(isValidClick);
 }
 
@@ -61,7 +66,8 @@ function write(results: TestResult[]): boolean {
 	} catch (e) {
 		const msg = e instanceof Error ? e.message : String(e);
 		if (typeof alert !== 'undefined') {
-			alert(`Failed to save to localStorage: ${msg}`);
+			const { _ } = i18nKit();
+			alert(_('保存に失敗しました', 'Failed to save') + `: ${msg}`);
 		}
 		return false;
 	}

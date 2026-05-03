@@ -28,6 +28,9 @@
 	let viewportW = $state(0);
 	let viewportH = $state(0);
 	let workAreaEl: HTMLElement | null = $state(null);
+	let startBtnEl: HTMLButtonElement | null = $state(null);
+	let resumeBtnEl: HTMLButtonElement | null = $state(null);
+	let saveBtnEl: HTMLButtonElement | null = $state(null);
 
 	// 計測用の非リアクティブ値
 	let startedAt = 0;
@@ -216,6 +219,14 @@
 		window.addEventListener('resize', updateViewport);
 		window.addEventListener('keydown', handleKey);
 		window.addEventListener('contextmenu', handleContextMenu);
+	});
+
+	// modal の表示状態が変わったら、各 modal 内の主要ボタンへフォーカスを移す。
+	// dialog semantics (role=dialog + aria-modal) と合わせて a11y 要件に対応する。
+	$effect(() => {
+		if (phase === 'intro' && startBtnEl && fits) startBtnEl.focus();
+		else if (phase === 'paused' && resumeBtnEl) resumeBtnEl.focus();
+		else if (phase === 'done' && saveBtnEl) saveBtnEl.focus();
 	});
 
 	onDestroy(() => {
@@ -447,9 +458,12 @@
 					class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm"
 				>
 					<div
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby="intro-modal-title"
 						class="bg-white border border-slate-300 rounded-lg shadow-lg p-6 w-[480px] max-w-[90vw]"
 					>
-						<h2 class="text-xl font-bold mb-1">{pattern.name}</h2>
+						<h2 id="intro-modal-title" class="text-xl font-bold mb-1">{pattern.name}</h2>
 						<p class="text-xs text-slate-400 font-mono mb-4">{pattern.id}</p>
 						<p class="text-sm text-slate-700 mb-4">
 							{_(pattern.description.ja, pattern.description.en)}
@@ -491,6 +505,7 @@
 								{_('戻る', 'Back')}
 							</a>
 							<button
+								bind:this={startBtnEl}
 								onclick={(e) => {
 									e.stopPropagation();
 									start();
@@ -511,9 +526,14 @@
 					class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm"
 				>
 					<div
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby="pause-modal-title"
 						class="bg-white border border-slate-300 rounded-lg shadow-lg p-6 w-[400px] max-w-[90vw]"
 					>
-						<h2 class="text-lg font-bold mb-2">{_('一時停止', 'Paused')}</h2>
+						<h2 id="pause-modal-title" class="text-lg font-bold mb-2">
+							{_('一時停止', 'Paused')}
+						</h2>
 						<p class="text-sm text-slate-600 mb-5">
 							{_(
 								'計測を中断しました。再開するか、キャンセルして最初に戻ります。',
@@ -530,6 +550,7 @@
 								>{_('キャンセル', 'Cancel')}</button
 							>
 							<button
+								bind:this={resumeBtnEl}
 								onclick={(e) => {
 									e.stopPropagation();
 									resume();
@@ -549,8 +570,15 @@
 					<div
 						class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm"
 					>
-						<div class="bg-white border border-slate-300 rounded-lg p-6 shadow-lg w-[480px]">
-							<h2 class="text-xl font-bold mb-4">{_('完了', 'Done')}</h2>
+						<div
+							role="dialog"
+							aria-modal="true"
+							aria-labelledby="done-modal-title"
+							class="bg-white border border-slate-300 rounded-lg p-6 shadow-lg w-[480px]"
+						>
+							<h2 id="done-modal-title" class="text-xl font-bold mb-4">
+								{_('完了', 'Done')}
+							</h2>
 							<div
 								class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4 text-center"
 							>
@@ -603,6 +631,7 @@
 									>{_('もう一度', 'Retry')}</button
 								>
 								<button
+									bind:this={saveBtnEl}
 									onclick={save}
 									class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
 									>{_('保存してトップへ', 'Save and go to top')}</button
