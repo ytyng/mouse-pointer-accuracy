@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { listPatterns } from '$lib/patterns';
-	import { listResults, deleteResult, clearAll } from '$lib/storage';
+	import { listResults, deleteResult, deleteResults, clearAll } from '$lib/storage';
 	import {
 		toJSON,
 		toTSV,
@@ -42,9 +42,26 @@
 		refresh();
 	}
 
+	// フィルター中はそのフィルターに該当するレコードのみ削除する。
+	// 全パターン表示時 ('all') のみ全削除を行う。
 	function onClearAll() {
-		if (!confirm(_('全ての記録を削除しますか?', 'Delete all records?'))) return;
-		clearAll();
+		if (selectedPatternFilter === 'all') {
+			if (!confirm(_('全ての記録を削除しますか?', 'Delete all records?'))) return;
+			clearAll();
+		} else {
+			const ids = filteredResults.map((r) => r.id);
+			if (ids.length === 0) return;
+			if (
+				!confirm(
+					_(
+						`現在のフィルターに該当する ${ids.length} 件を削除しますか?`,
+						`Delete ${ids.length} filtered records?`
+					)
+				)
+			)
+				return;
+			deleteResults(ids);
+		}
 		refresh();
 	}
 
@@ -123,10 +140,17 @@
 
 		{#if filteredResults.length === 0}
 			<p class="text-slate-500 text-sm">
-				{_(
-					'まだ記録がありません。テストパターンを選んで計測してください。',
-					'No records yet. Pick a pattern and run a test.'
-				)}
+				{#if selectedPatternFilter !== 'all' && results.length > 0}
+					{_(
+						'このパターンの記録はまだありません。',
+						'No records for this pattern yet.'
+					)}
+				{:else}
+					{_(
+						'まだ記録がありません。テストパターンを選んで計測してください。',
+						'No records yet. Pick a pattern and run a test.'
+					)}
+				{/if}
 			</p>
 		{:else}
 			<div class="flex gap-2 mb-3">
@@ -149,7 +173,9 @@
 				<button
 					onclick={onClearAll}
 					class="bg-red-600 text-white text-sm px-3 py-1.5 rounded hover:bg-red-700"
-					>{_('全削除', 'Delete all')}</button
+					>{selectedPatternFilter === 'all'
+						? _('全削除', 'Delete all')
+						: _('フィルター対象を削除', 'Delete filtered')}</button
 				>
 			</div>
 

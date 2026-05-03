@@ -31,6 +31,8 @@
 	let startBtnEl: HTMLButtonElement | null = $state(null);
 	let resumeBtnEl: HTMLButtonElement | null = $state(null);
 	let saveBtnEl: HTMLButtonElement | null = $state(null);
+	// 二重保存防止用。Save ボタン押下中は再入を阻止する。
+	let saving = $state(false);
 
 	// 計測用の非リアクティブ値
 	let startedAt = 0;
@@ -86,6 +88,7 @@
 		totalPauseMs = 0;
 		missMarks = [];
 		missFlash = 0;
+		saving = false;
 	}
 
 	function start() {
@@ -266,10 +269,14 @@
 	});
 
 	function save() {
-		if (!summary) return;
+		if (saving || !summary) return;
+		saving = true;
 		// saveResult が false を返した場合 (localStorage quota 超過等) は
 		// alert で通知済み。Done モーダルに留まりリトライ/別の操作を可能にする。
-		if (!saveResult(summary)) return;
+		if (!saveResult(summary)) {
+			saving = false;
+			return;
+		}
 		recordName = '';
 		goto(resolve('/'));
 	}
@@ -633,7 +640,8 @@
 								<button
 									bind:this={saveBtnEl}
 									onclick={save}
-									class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+									disabled={saving}
+									class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
 									>{_('保存してトップへ', 'Save and go to top')}</button
 								>
 							</div>

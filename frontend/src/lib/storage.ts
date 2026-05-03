@@ -56,9 +56,22 @@ function read(): TestResult[] {
 	}
 }
 
+type Op = 'save' | 'delete' | 'clear';
+
+function localizeOpFailure(op: Op, errorMsg: string): string {
+	const { _ } = i18nKit();
+	const label =
+		op === 'save'
+			? _('保存に失敗しました', 'Failed to save')
+			: op === 'delete'
+				? _('削除に失敗しました', 'Failed to delete')
+				: _('全削除に失敗しました', 'Failed to clear all');
+	return `${label}: ${errorMsg}`;
+}
+
 // localStorage.setItem は quota 超過などで throw する可能性があるため捕捉する。
-// 失敗時は alert で通知し false を返す。
-function write(results: TestResult[]): boolean {
+// 失敗時は op 別の alert で通知し false を返す。
+function write(results: TestResult[], op: Op): boolean {
 	if (typeof localStorage === 'undefined') return false;
 	try {
 		localStorage.setItem(KEY, JSON.stringify(results));
@@ -66,8 +79,7 @@ function write(results: TestResult[]): boolean {
 	} catch (e) {
 		const msg = e instanceof Error ? e.message : String(e);
 		if (typeof alert !== 'undefined') {
-			const { _ } = i18nKit();
-			alert(_('保存に失敗しました', 'Failed to save') + `: ${msg}`);
+			alert(localizeOpFailure(op, msg));
 		}
 		return false;
 	}
@@ -80,13 +92,26 @@ export function listResults(): TestResult[] {
 export function saveResult(result: TestResult): boolean {
 	const all = read();
 	all.push(result);
-	return write(all);
+	return write(all, 'save');
 }
 
 export function deleteResult(id: string): boolean {
-	return write(read().filter((r) => r.id !== id));
+	return write(
+		read().filter((r) => r.id !== id),
+		'delete'
+	);
+}
+
+// 指定された id 集合のレコードをまとめて削除する。
+// 引数なしの clearAll も別途用意して全削除を区別する。
+export function deleteResults(ids: string[]): boolean {
+	const set = new Set(ids);
+	return write(
+		read().filter((r) => !set.has(r.id)),
+		'delete'
+	);
 }
 
 export function clearAll(): boolean {
-	return write([]);
+	return write([], 'clear');
 }
