@@ -3,7 +3,15 @@
 	import { resolve } from '$app/paths';
 	import { listPatterns } from '$lib/patterns';
 	import { listResults, deleteResult, clearAll } from '$lib/storage';
-	import { toJSON, toTSV, toMarkdown, download, fmtSec, fmtDateTime } from '$lib/export';
+	import {
+		toJSON,
+		toTSV,
+		toMarkdown,
+		download,
+		fmtSec,
+		fmtDateTime,
+		sanitizeFilename
+	} from '$lib/export';
 	import { i18nKit } from '$lib/i18n';
 	import { humanReadableTime } from '$lib/svelteutils/time';
 	import type { TestResult } from '$lib/types';
@@ -55,7 +63,7 @@
 	}
 
 	function exportSingle(r: TestResult, kind: 'json' | 'tsv' | 'md') {
-		const stem = `mpa-${r.patternId}-${r.name}-${ts()}`;
+		const stem = sanitizeFilename(`mpa-${r.patternId}-${r.name}-${ts()}`);
 		if (kind === 'json') download(`${stem}.json`, 'application/json', toJSON([r]));
 		if (kind === 'tsv') download(`${stem}.tsv`, 'text/tab-separated-values', toTSV([r]));
 		if (kind === 'md') download(`${stem}.md`, 'text/markdown', toMarkdown([r]));
@@ -81,7 +89,9 @@
 					<a href={resolve('/test/[pattern]', { pattern: p.id })} class="block">
 						<div class="font-mono text-xs text-slate-400">{p.id}</div>
 						<div class="font-semibold mt-0.5">{p.name}</div>
-						<div class="text-sm text-slate-600 mt-2">{p.description}</div>
+						<div class="text-sm text-slate-600 mt-2">
+							{_(p.description.ja, p.description.en)}
+						</div>
 						<div class="text-xs text-slate-500 mt-3">
 							{_('ワークエリア', 'Work area')} {p.workWidth}×{p.workHeight} /
 							{_('ターゲット', 'Targets')} {p.targets.length} /

@@ -231,7 +231,9 @@
 		if (!pattern || phase !== 'done' || clicks.length === 0) return null;
 		const totalMs = clicks[clicks.length - 1].tSinceStart;
 		const hits = clicks.filter((c) => c.hit);
-		const intervals = hits.map((c) => c.tSincePrev);
+		// 初回ヒットの tSincePrev は startedAt 基準なので「反応時間」を含む。
+		// クリック間隔の平均としては 2 回目以降のヒットだけで算出する。
+		const intervals = hits.slice(1).map((c) => c.tSincePrev);
 		const avgIntervalMs =
 			intervals.length > 0 ? intervals.reduce((a, b) => a + b, 0) / intervals.length : 0;
 		const missClicks = clicks.length - hits.length;
@@ -254,7 +256,9 @@
 
 	function save() {
 		if (!summary) return;
-		saveResult(summary);
+		// saveResult が false を返した場合 (localStorage quota 超過等) は
+		// alert で通知済み。Done モーダルに留まりリトライ/別の操作を可能にする。
+		if (!saveResult(summary)) return;
 		recordName = '';
 		goto(resolve('/'));
 	}
@@ -447,7 +451,9 @@
 					>
 						<h2 class="text-xl font-bold mb-1">{pattern.name}</h2>
 						<p class="text-xs text-slate-400 font-mono mb-4">{pattern.id}</p>
-						<p class="text-sm text-slate-700 mb-4">{pattern.description}</p>
+						<p class="text-sm text-slate-700 mb-4">
+							{_(pattern.description.ja, pattern.description.en)}
+						</p>
 						<dl class="text-xs text-slate-500 grid grid-cols-2 gap-y-1 mb-5">
 							<dt>{_('ワークエリア', 'Work area')}</dt>
 							<dd class="text-right tabular-nums">

@@ -9,7 +9,7 @@ export interface Target {
 export interface TestPattern {
 	id: string;
 	name: string;
-	description: string;
+	description: { ja: string; en: string };
 	workWidth: number;
 	workHeight: number;
 	targetDiameter: number;

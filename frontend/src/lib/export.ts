@@ -5,6 +5,22 @@ function fmtMs(ms: number): string {
 	return ms.toFixed(1);
 }
 
+// ファイル名に使えない文字 (Windows の禁止文字 + 制御文字 + パス区切り) を _ に置換
+export function sanitizeFilename(s: string): string {
+	// eslint-disable-next-line no-control-regex
+	return s.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_');
+}
+
+// TSV のセル内に入ると壊れる文字 (TAB / 改行) を半角スペースに置換
+function sanitizeTsvCell(s: string): string {
+	return s.replace(/[\t\r\n]/g, ' ');
+}
+
+// Markdown 見出しやテーブルセルを破壊する文字 (改行 / |) を置換
+function sanitizeMdInline(s: string): string {
+	return s.replace(/[\r\n]/g, ' ').replace(/\|/g, '\\|');
+}
+
 export function fmtSec(ms: number): string {
 	return (ms / 1000).toFixed(2);
 }
@@ -51,11 +67,11 @@ export function toTSV(results: TestResult[]): string {
 		r.clicks.forEach((c, i) => {
 			rows.push(
 				[
-					r.id,
-					r.name,
-					r.patternId,
-					r.patternName,
-					r.createdAt,
+					sanitizeTsvCell(r.id),
+					sanitizeTsvCell(r.name),
+					sanitizeTsvCell(r.patternId),
+					sanitizeTsvCell(r.patternName),
+					sanitizeTsvCell(r.createdAt),
 					(r.score ?? 0).toFixed(2),
 					fmtMs(r.totalMs),
 					String(r.totalClicks),
@@ -82,9 +98,11 @@ export function toTSV(results: TestResult[]): string {
 export function toMarkdown(results: TestResult[]): string {
 	const out: string[] = ['# Mouse Pointer Accuracy Records', ''];
 	for (const r of results) {
-		out.push(`## ${r.name}`);
+		out.push(`## ${sanitizeMdInline(r.name)}`);
 		out.push('');
-		out.push(`- **Pattern**: ${r.patternName} (\`${r.patternId}\`)`);
+		out.push(
+			`- **Pattern**: ${sanitizeMdInline(r.patternName)} (\`${sanitizeMdInline(r.patternId)}\`)`
+		);
 		out.push(`- **Created**: ${fmtDateTime(r.createdAt)}`);
 		out.push(`- **Score**: ${(r.score ?? 0).toFixed(2)}`);
 		out.push(`- **Total time**: ${fmtSec(r.totalMs)} s`);

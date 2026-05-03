@@ -37,8 +37,10 @@ export const PATTERNS: Record<string, TestPattern> = {
 	'sequential-1': {
 		id: 'sequential-1',
 		name: 'Sequential 1',
-		description:
-			'8点を 1→2→3→4→5→6→7→8→1 の順で3周クリックする基本テスト。',
+		description: {
+			ja: '8点を 1→2→3→4→5→6→7→8→1 の順で3周クリックする基本テスト。',
+			en: 'Click 8 points in the order 1→2→3→4→5→6→7→8→1 for 3 laps. Basic test.'
+		},
 		workWidth: W,
 		workHeight: H,
 		targetDiameter: D,
