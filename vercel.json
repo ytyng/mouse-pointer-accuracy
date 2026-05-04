@@ -1,0 +1,4 @@
+{
+  "buildCommand": "frontend/sh/build-for-vercel.sh",
+  "installCommand": "echo skip"
+}
