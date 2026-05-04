@@ -62,9 +62,22 @@ pnpm dev
 pnpm build
 ```
 
-型チェック / lint:
+型チェック / lint / 整形:
 
 ```sh
-pnpm check
-pnpm lint
+pnpm check    # svelte-check (型チェック)
+pnpm lint     # prettier --check + eslint
+pnpm format   # prettier --write
 ```
+
+## デプロイ
+
+Vercel に `@sveltejs/adapter-vercel` でデプロイする。private submodule
+(`cyberneura/svelteutils`) を `GITHUB_PAT` 環境変数経由で clone する仕組みを
+`frontend/sh/build-for-vercel.sh` に持つ。詳細は
+[`frontend/README.md`](./frontend/README.md#vercel-デプロイ) を参照。
+
+## AI エージェント向けガイド
+
+[`AGENTS.md`](./AGENTS.md) (= `CLAUDE.md`) にプロジェクト構成・開発フロー・
+コーディング規約・デプロイ手順をまとめている。
