@@ -1,70 +1,71 @@
 # frontend
 
-SvelteKit 製のフロントエンド。プロジェクト概要は[ルートの README](../README.md) を参照。
+SvelteKit-based frontend. See the [root README](../README.md) for the project overview.
 
-## 開発
+## Development
 
-`src/lib/svelteutils` は git submodule なので、未取得なら先に初期化:
+`src/lib/svelteutils` is a git submodule, so initialize it first if not yet fetched:
 
 ```sh
 git submodule update --init --recursive
 ```
 
-その後:
+Then:
 
 ```sh
 pnpm install
 pnpm dev
 ```
 
-## ビルド
+## Build
 
 ```sh
 pnpm build
-pnpm preview  # production build をローカルで確認
+pnpm preview  # check production build locally
 ```
 
-## チェック
+## Checks
 
 ```sh
-pnpm check    # svelte-check (型チェック)
+pnpm check    # svelte-check (type-check)
 pnpm lint     # prettier --check + eslint
-pnpm format   # prettier --write (整形)
+pnpm format   # prettier --write
 ```
 
-## Vercel デプロイ
+## Vercel deploy
 
-`@sveltejs/adapter-vercel` を使う。`src/lib/svelteutils` が private submodule
-(`cyberneura/svelteutils`) のため、Vercel の build は GitHub PAT 経由で submodule
-を clone する必要がある。
+Uses `@sveltejs/adapter-vercel`. Because `src/lib/svelteutils` is a private submodule
+(`cyberneura/svelteutils`), the Vercel build needs to clone the submodule via a
+GitHub PAT.
 
-### Vercel 側設定
+### Vercel project settings
 
-- **Root Directory**: (デフォルト = repo root)
-- **Framework Preset**: Other (vercel.json で全て制御するため)
-- **Node.js Version**: 22.13 以上 (`package.json` の `engines.node` と一致)
+- **Root Directory**: (default = repo root)
+- **Framework Preset**: Other (vercel.json controls everything)
+- **Node.js Version**: 22.13 or later (matches `engines.node` in `package.json`)
 - **Environment Variables**:
-  - `GITHUB_PAT`: cyberneura/svelteutils を clone できる Fine-grained PAT
-    (`Contents: Read` 権限)。
-    https://github.com/settings/tokens?type=beta で発行する。
+  - `GITHUB_PAT`: a Fine-grained PAT that can clone cyberneura/svelteutils
+    (`Contents: Read` permission). Issue it at
+    https://github.com/settings/tokens?type=beta.
 
-### ビルドの仕組み
+### How the build works
 
-repo root の `vercel.json` で `buildCommand` を `frontend/sh/build-for-vercel.sh`
-にしている。スクリプトの動作:
+The repo-root `vercel.json` sets `buildCommand` to `frontend/sh/build-for-vercel.sh`.
+The script does:
 
-1. repo root に移動して `GIT_ASKPASS` 経由で `GITHUB_PAT` を git に渡す
-   (URL に PAT を埋め込まないことでログ漏洩を防ぐ)。
-2. `git submodule update --init --recursive` で svelteutils を clone。
-3. `frontend/` で `pnpm install --frozen-lockfile` + `pnpm build`。
-4. `frontend/.vercel/output` を repo root の `.vercel/output` に移動
-   (Vercel Build Output API の要求)。
+1. Move to repo root and pass `GITHUB_PAT` to git via `GIT_ASKPASS`
+   (avoids embedding the PAT in URLs to prevent log leakage).
+2. `git submodule update --init --recursive` to clone svelteutils.
+3. In `frontend/`, run `pnpm install --frozen-lockfile` + `pnpm build`.
+4. Move `frontend/.vercel/output` to repo root `.vercel/output`
+   (required by the Vercel Build Output API).
 
-詳細は `frontend/sh/build-for-vercel.sh` を参照。
+See `frontend/sh/build-for-vercel.sh` for details.
 
-## メモ
+## Notes
 
-- `prettier-plugin-tailwindcss` は今回入れていない。
-  `prettier-plugin-svelte` 3.5.x と組み合わさると `+page.svelte` で
-  "TypeError: getVisitorKeys is not a function" のフォーマット失敗が発生するため。
-  Tailwind クラスの自動ソートが必要になり、互換性のあるバージョンが揃った時点で再導入する。
+- `prettier-plugin-tailwindcss` is intentionally not included.
+  Combined with `prettier-plugin-svelte` 3.5.x it causes a
+  "TypeError: getVisitorKeys is not a function" failure when formatting `+page.svelte`.
+  We will reintroduce it (for automatic Tailwind class sorting) once compatible
+  versions are available.

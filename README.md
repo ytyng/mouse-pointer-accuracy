@@ -1,54 +1,56 @@
 # Mouse Pointer Accuracy
 
-マウスポインタの精度・速度を計測する Web アプリ。
+A web app for measuring mouse pointer accuracy and speed.
 
-クリック対象として配置された 8 個の小さな円を決められた順序で正確かつ高速にクリックし、所要時間とミスクリック数からスコアを算出する。マウス・トラックパッド・トラックボールなどポインティングデバイスの性能比較や、自分のコンディションの計測に使う。
+It asks you to click 8 small circles laid out on the screen in a fixed order as quickly and accurately as possible, then computes a score from the elapsed time and the number of miss-clicks. Useful for comparing pointing devices such as mice, trackpads, and trackballs.
 
-## 機能
+Public site: https://mouse-pointer.ytyng.com/
 
-- **テストパターン**: `sequential-1` (8 点を `1→2→3→4→5→6→7→8→1` で 3 周)
-- **計測項目**: 合計時間、ヒット/ミス数、ミス率、平均クリック間隔、スコア
-- **スコア式 (sequential-1)**: `120 - 経過秒 - ミス数 × 2`
-- **記録保存**: ブラウザの `localStorage` (`mpa.results.v1`) に名前付きで保存
-- **エクスポート**: JSON / TSV / Markdown 形式で個別または一括ダウンロード
-- **多言語**: ブラウザ言語設定により日本語 / 英語を自動切り替え
+## Features
 
-## ワークエリア
+- **Test pattern**: `sequential-1` (click 8 points in the order `1→2→3→4→5→6→7→8→1` for 3 laps)
+- **Metrics**: total time, hit / miss count, miss rate, average inter-click interval, score
+- **Score formula (sequential-1)**: `120 - elapsed seconds - misses × 2`
+- **Persistence**: results saved with a name in browser `localStorage` (`mpa.results.v1`)
+- **Export**: download individual or bulk records as JSON / TSV / Markdown
+- **i18n**: auto-switch between Japanese / English based on browser language
 
-1600 × 900 px 固定。HDMI (1920 × 1080) 以上の解像度のディスプレイで、ブラウザを最大化して使うことを推奨。ブラウザの設定でツールバーが大きい等で収まらない場合、別のブラウザを使う必要がある。
+## Work area
 
-## 操作
+Fixed at 1600 × 900 px. We recommend a display with HDMI (1920 × 1080) resolution or higher, with the browser maximized. If the area does not fit because of browser chrome (large tab bar, etc.), try a different browser.
 
-- ホームページからテストパターンを選ぶ
-- スタートボタンで計測開始
-- 赤くハイライトされたターゲットを順次クリック
-- 矢印が次の動きを示す (濃い実線 = 今クリックする方向、薄い破線 = 次の予告)
-- ミスは赤い X マークと画面外周の赤フラッシュでフィードバック
-- ESC / 右クリック / 中央 Cancel ボタンで一時停止 (再開 or キャンセル)
-- 完了後、記録名を入れて保存 → ホームページの記録一覧に表示
+## How to play
 
-## 技術スタック
+- Pick a test pattern from the home page.
+- Press Start to begin measuring.
+- Click the highlighted (red) target in sequence.
+- Arrows indicate the next move (solid red = current move, dashed amber = next preview).
+- Misses are shown with a red X mark and a red screen-edge flash.
+- ESC / right-click / the centered Cancel button pause the test (resume or cancel).
+- After completion, enter a name and save — the record appears in the home page list.
+
+## Tech stack
 
 - SvelteKit 2 + Svelte 5 (runes mode)
 - TypeScript
 - Tailwind CSS 4
-- 完全クライアントレンダリング (`ssr = false`)
+- Fully client-rendered (`ssr = false`)
 
-## 開発
+## Development
 
-`src/lib/svelteutils` は git submodule なので、初回クローン時は recurse-submodules する:
+`src/lib/svelteutils` is a git submodule, so use `--recurse-submodules` on first clone:
 
 ```sh
 git clone --recurse-submodules https://github.com/ytyng/mouse-pointer-accuracy.git
 ```
 
-既にクローン済みの場合:
+If already cloned without submodules:
 
 ```sh
 git submodule update --init --recursive
 ```
 
-その後:
+Then:
 
 ```sh
 cd frontend
@@ -56,28 +58,24 @@ pnpm install
 pnpm dev
 ```
 
-ビルド:
+Build:
 
 ```sh
 pnpm build
 ```
 
-型チェック / lint / 整形:
+Type-check / lint / format:
 
 ```sh
-pnpm check    # svelte-check (型チェック)
+pnpm check    # svelte-check (type-check)
 pnpm lint     # prettier --check + eslint
 pnpm format   # prettier --write
 ```
 
-## デプロイ
+## Deployment
 
-Vercel に `@sveltejs/adapter-vercel` でデプロイする。private submodule
-(`cyberneura/svelteutils`) を `GITHUB_PAT` 環境変数経由で clone する仕組みを
-`frontend/sh/build-for-vercel.sh` に持つ。詳細は
-[`frontend/README.md`](./frontend/README.md#vercel-デプロイ) を参照。
+Deployed to Vercel via `@sveltejs/adapter-vercel`. The private submodule (`cyberneura/svelteutils`) is cloned with a `GITHUB_PAT` environment variable through `frontend/sh/build-for-vercel.sh`. See [`frontend/README.md`](./frontend/README.md#vercel-deploy) for details.
 
-## AI エージェント向けガイド
+## Guide for AI agents
 
-[`AGENTS.md`](./AGENTS.md) (= `CLAUDE.md`) にプロジェクト構成・開発フロー・
-コーディング規約・デプロイ手順をまとめている。
+[`AGENTS.md`](./AGENTS.md) (symlinked from `CLAUDE.md`) contains the project layout, development workflow, coding conventions, and deployment notes.
