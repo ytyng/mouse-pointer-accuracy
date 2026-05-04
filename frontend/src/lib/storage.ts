@@ -31,9 +31,11 @@ function isValidResult(r: unknown): r is TestResult {
 
 function read(): TestResult[] {
   if (typeof localStorage === 'undefined') return [];
-  const raw = localStorage.getItem(KEY);
-  if (!raw) return [];
+  // localStorage.getItem 自体も privacy mode / restricted storage で SecurityError を
+  // throw しうるため、JSON.parse とまとめて try/catch する。
   try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isValidResult);
