@@ -545,7 +545,7 @@
                 <input
                   bind:value={recordName}
                   type="text"
-                  placeholder={_('例: 普段のマウス + パッド', 'e.g. usual mouse + pad')}
+                  placeholder={_('例: 普段のマウス', 'e.g. usual mouse')}
                   class="mt-1 w-full border border-slate-300 rounded px-3 py-2"
                 />
               </label>
@@ -586,6 +586,9 @@
                   <i class="bi bi-floppy"></i>
                   {_('保存してトップへ', 'Save and go to top')}
                 </button>
+              </div>
+              <div class="mt-2 text-right text-xs text-slate-500">
+                {_('ブラウザのローカルストレージに記録します', 'Saved to browser local storage')}
               </div>
             </div>
           </div>
