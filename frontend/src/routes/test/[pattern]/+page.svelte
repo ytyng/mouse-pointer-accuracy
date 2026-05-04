@@ -287,7 +287,10 @@
 		<p class="text-red-600">
 			{_('パターン', 'Pattern')} "{patternId}" {_('が見つかりません。', 'not found.')}
 		</p>
-		<a href={resolve('/')} class="text-blue-600 underline">{_('トップへ戻る', 'Back to top')}</a>
+		<a href={resolve('/')} class="text-blue-600 underline inline-flex items-center gap-1">
+			<i class="bi bi-arrow-left"></i>
+			{_('トップへ戻る', 'Back to top')}
+		</a>
 	</div>
 {:else}
 	<div
@@ -442,9 +445,10 @@
 						e.stopPropagation();
 						pause();
 					}}
-					class="absolute text-xs text-slate-400 hover:text-slate-700 underline"
+					class="absolute text-xs text-slate-400 hover:text-slate-700 underline inline-flex items-center gap-1"
 					style="left: 50%; top: 50%; transform: translate(-50%, -50%);"
 				>
+					<i class="bi bi-x-circle"></i>
 					{_('キャンセル', 'Cancel')}
 				</button>
 
@@ -507,8 +511,9 @@
 						<div class="flex justify-end gap-2">
 							<a
 								href={resolve('/')}
-								class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100 text-sm"
+								class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100 text-sm inline-flex items-center gap-1.5"
 							>
+								<i class="bi bi-arrow-left"></i>
 								{_('戻る', 'Back')}
 							</a>
 							<button
@@ -518,8 +523,9 @@
 									start();
 								}}
 								disabled={!fits}
-								class="px-5 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-sm font-semibold"
+								class="px-5 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-sm font-semibold inline-flex items-center gap-1.5"
 							>
+								<i class="bi bi-play-fill"></i>
 								{_('スタート', 'Start')}
 							</button>
 						</div>
@@ -538,7 +544,8 @@
 						aria-labelledby="pause-modal-title"
 						class="bg-white border border-slate-300 rounded-lg shadow-lg p-6 w-[400px] max-w-[90vw]"
 					>
-						<h2 id="pause-modal-title" class="text-lg font-bold mb-2">
+						<h2 id="pause-modal-title" class="text-lg font-bold mb-2 flex items-center gap-2">
+							<i class="bi bi-pause-circle-fill text-amber-500"></i>
 							{_('一時停止', 'Paused')}
 						</h2>
 						<p class="text-sm text-slate-600 mb-5">
@@ -553,18 +560,22 @@
 									e.stopPropagation();
 									cancel();
 								}}
-								class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100 text-sm"
-								>{_('キャンセル', 'Cancel')}</button
+								class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100 text-sm inline-flex items-center gap-1.5"
 							>
+								<i class="bi bi-x-circle"></i>
+								{_('キャンセル', 'Cancel')}
+							</button>
 							<button
 								bind:this={resumeBtnEl}
 								onclick={(e) => {
 									e.stopPropagation();
 									resume();
 								}}
-								class="px-5 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-semibold"
-								>{_('再開', 'Resume')}</button
+								class="px-5 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-semibold inline-flex items-center gap-1.5"
 							>
+								<i class="bi bi-play-fill"></i>
+								{_('再開', 'Resume')}
+							</button>
 						</div>
 					</div>
 				</div>
@@ -583,7 +594,8 @@
 							aria-labelledby="done-modal-title"
 							class="bg-white border border-slate-300 rounded-lg p-6 shadow-lg w-[480px]"
 						>
-							<h2 id="done-modal-title" class="text-xl font-bold mb-4">
+							<h2 id="done-modal-title" class="text-xl font-bold mb-4 flex items-center gap-2">
+								<i class="bi bi-check-circle-fill text-emerald-600"></i>
 								{_('完了', 'Done')}
 							</h2>
 							<div
@@ -634,16 +646,20 @@
 							<div class="flex justify-end gap-2 mt-4">
 								<button
 									onclick={reset}
-									class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100"
-									>{_('もう一度', 'Retry')}</button
+									class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1.5"
 								>
+									<i class="bi bi-arrow-counterclockwise"></i>
+									{_('もう一度', 'Retry')}
+								</button>
 								<button
 									bind:this={saveBtnEl}
 									onclick={save}
 									disabled={saving}
-									class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
-									>{_('保存してトップへ', 'Save and go to top')}</button
+									class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
 								>
+									<i class="bi bi-floppy"></i>
+									{_('保存してトップへ', 'Save and go to top')}
+								</button>
 							</div>
 						</div>
 					</div>

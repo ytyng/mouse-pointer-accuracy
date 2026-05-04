@@ -38,8 +38,8 @@ export const PATTERNS: Record<string, TestPattern> = {
 		id: 'sequential-1',
 		name: 'Sequential 1',
 		description: {
-			ja: '8点を 1→2→3→4→5→6→7→8→1 の順で3周クリックする基本テスト。',
-			en: 'Click 8 points in the order 1→2→3→4→5→6→7→8→1 for 3 laps. Basic test.'
+			ja: 'ブラウザウィンドウの四隅とその間に設定された8点を、決まった順番に3週クリックするテスト。HDMIディスプレイでブラウザウインドウを最大化してください。',
+			en: 'A test to click 8 targets arranged in and around the corners of the browser window in a fixed order for 3 laps. Please maximize the browser window on an HDMI display.'
 		},
 		workWidth: W,
 		workHeight: H,

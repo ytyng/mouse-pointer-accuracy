@@ -89,7 +89,10 @@
 
 <div class="mx-auto max-w-5xl p-8">
 	<header class="mb-8">
-		<h1 class="text-3xl font-bold">Mouse Pointer Accuracy</h1>
+		<h1 class="text-3xl font-bold flex items-center gap-3">
+			<i class="bi bi-bullseye text-rose-500"></i>
+			Mouse Pointer Accuracy
+		</h1>
 		<p class="text-slate-500 mt-1">
 			{_(
 				'マウスポインタの精度・速度を計測する。',
@@ -99,19 +102,29 @@
 	</header>
 
 	<section class="mb-12">
-		<h2 class="text-xl font-semibold mb-4">{_('テストパターン', 'Test patterns')}</h2>
+		<h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+			<i class="bi bi-grid-3x3-gap text-slate-500"></i>
+			{_('テストパターン', 'Test patterns')}
+		</h2>
 		<ul class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 			{#each patterns as p (p.id)}
 				<li class="border border-slate-200 rounded-lg p-4 hover:border-slate-400 transition bg-slate-50">
-					<a href={resolve('/test/[pattern]', { pattern: p.id })} class="block">
-						<div class="font-mono text-xs text-slate-400">{p.id}</div>
+					<a
+						href={resolve('/test/[pattern]', { pattern: p.id })}
+						class="block group"
+					>
+						<div class="flex items-start justify-between gap-2">
+							<div class="font-mono text-xs text-slate-400">{p.id}</div>
+							<i
+								class="bi bi-arrow-right text-slate-300 group-hover:text-slate-700 transition-colors"
+							></i>
+						</div>
 						<div class="font-semibold mt-0.5">{p.name}</div>
 						<div class="text-sm text-slate-600 mt-2">
 							{_(p.description.ja, p.description.en)}
 						</div>
-						<div class="text-xs text-slate-500 mt-3">
-							{_('ワークエリア', 'Work area')} {p.workWidth}×{p.workHeight} /
-							{_('ターゲット', 'Targets')} {p.targets.length} /
+						<div class="text-xs text-slate-500 mt-3 flex items-center gap-1">
+							<i class="bi bi-cursor-fill"></i>
 							{_('クリック数', 'Clicks')} {p.sequence.length}
 						</div>
 					</a>
@@ -122,10 +135,12 @@
 
 	<section>
 		<div class="flex items-center justify-between mb-4">
-			<h2 class="text-xl font-semibold">
+			<h2 class="text-xl font-semibold flex items-center gap-2">
+				<i class="bi bi-clipboard-data text-slate-500"></i>
 				{_('記録', 'Records')} ({filteredResults.length})
 			</h2>
 			<div class="flex items-center gap-2">
+				<i class="bi bi-funnel text-slate-400 text-sm"></i>
 				<select
 					bind:value={selectedPatternFilter}
 					class="border border-slate-300 rounded px-2 py-1 text-sm"
@@ -139,7 +154,8 @@
 		</div>
 
 		{#if filteredResults.length === 0}
-			<p class="text-slate-500 text-sm">
+			<p class="text-slate-500 text-sm flex items-center gap-2">
+				<i class="bi bi-inbox text-lg"></i>
 				{#if selectedPatternFilter !== 'all' && results.length > 0}
 					{_(
 						'このパターンの記録はまだありません。',
@@ -153,30 +169,41 @@
 				{/if}
 			</p>
 		{:else}
-			<div class="flex gap-2 mb-3">
+			<div class="flex gap-2 mb-3 flex-wrap">
 				<button
 					onclick={exportJSON}
-					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
-					>{_('JSON 一括', 'Export JSON')}</button
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700 inline-flex items-center gap-1.5"
 				>
+					<i class="bi bi-download"></i>
+					<i class="bi bi-filetype-json"></i>
+					{_('JSON 一括', 'Export JSON')}
+				</button>
 				<button
 					onclick={exportTSV}
-					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
-					>{_('TSV 一括', 'Export TSV')}</button
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700 inline-flex items-center gap-1.5"
 				>
+					<i class="bi bi-download"></i>
+					<i class="bi bi-table"></i>
+					{_('TSV 一括', 'Export TSV')}
+				</button>
 				<button
 					onclick={exportMD}
-					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700"
-					>{_('Markdown 一括', 'Export Markdown')}</button
+					class="bg-slate-800 text-white text-sm px-3 py-1.5 rounded hover:bg-slate-700 inline-flex items-center gap-1.5"
 				>
+					<i class="bi bi-download"></i>
+					<i class="bi bi-filetype-md"></i>
+					{_('Markdown 一括', 'Export Markdown')}
+				</button>
 				<div class="flex-1"></div>
 				<button
 					onclick={onClearAll}
-					class="bg-red-600 text-white text-sm px-3 py-1.5 rounded hover:bg-red-700"
-					>{selectedPatternFilter === 'all'
-						? _('全削除', 'Delete all')
-						: _('フィルター対象を削除', 'Delete filtered')}</button
+					class="bg-red-600 text-white text-sm px-3 py-1.5 rounded hover:bg-red-700 inline-flex items-center gap-1.5"
 				>
+					<i class="bi bi-trash3"></i>
+					{selectedPatternFilter === 'all'
+						? _('全削除', 'Delete all')
+						: _('フィルター対象を削除', 'Delete filtered')}
+				</button>
 			</div>
 
 			<div class="overflow-x-auto">
@@ -216,24 +243,33 @@
 									<div class="flex gap-1 justify-end">
 										<button
 											onclick={() => exportSingle(r, 'json')}
-											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
-											>JSON</button
+											title="Export JSON"
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
 										>
+											<i class="bi bi-filetype-json"></i> JSON
+										</button>
 										<button
 											onclick={() => exportSingle(r, 'tsv')}
-											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
-											>TSV</button
+											title="Export TSV"
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
 										>
+											<i class="bi bi-table"></i> TSV
+										</button>
 										<button
 											onclick={() => exportSingle(r, 'md')}
-											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100"
-											>MD</button
+											title="Export Markdown"
+											class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
 										>
+											<i class="bi bi-filetype-md"></i> MD
+										</button>
 										<button
 											onclick={() => onDelete(r.id, r.name)}
-											class="text-xs px-2 py-1 border border-red-300 text-red-600 rounded hover:bg-red-50"
-											>{_('削除', 'Delete')}</button
+											title="Delete"
+											class="text-xs px-2 py-1 border border-red-300 text-red-600 rounded hover:bg-red-50 inline-flex items-center gap-1"
 										>
+											<i class="bi bi-trash3"></i>
+											{_('削除', 'Delete')}
+										</button>
 									</div>
 								</td>
 							</tr>
@@ -242,5 +278,8 @@
 				</table>
 			</div>
 		{/if}
+    <div class="text-xs text-slate-600 mt-3">
+      {_('ブラウザのローカルストレージに記録します。', 'Records are stored in the browser\'s local storage.')}
+    </div>
 	</section>
 </div>
