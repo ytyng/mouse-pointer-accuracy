@@ -8,6 +8,9 @@ export interface Target {
 
 export interface TestPattern {
   id: string;
+  // パターン仕様 (ターゲット配置・スコア式・シーケンス等) を変更したら増やす。
+  // 異なる version 同士の記録は厳密には同じ条件で計測されていないため比較注意。
+  version: number;
   name: { ja: string; en: string };
   description: { ja: string; en: string };
   workWidth: number;
@@ -30,11 +33,17 @@ export interface ClickEvent {
   tSincePrev: number;
 }
 
+// localStorage に保存するサマリー。
+// patternName はマスターデータ (PATTERNS) から id 経由で都度引くため保存しない。
+// 個別のクリック詳細 (ClickEvent[]) も保存しない。
+// score / 旧フィールドは optional 扱いで、過去の保存形式との互換を保つ。
 export interface TestResult {
   id: string;
   name: string;
   patternId: string;
-  patternName: string;
+  // 計測時の TestPattern.version を記録する。マスターのバージョンが上がっても
+  // 過去の記録がどの仕様で取られたかを後から識別できるようにするため。
+  patternVersion: number;
   createdAt: string;
   totalMs: number;
   totalClicks: number;
@@ -42,7 +51,5 @@ export interface TestResult {
   missClicks: number;
   missRate: number;
   avgIntervalMs: number;
-  // Optional: 旧バージョンで保存された記録には score が無い場合があるため
   score?: number;
-  clicks: ClickEvent[];
 }

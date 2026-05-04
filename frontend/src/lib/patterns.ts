@@ -36,6 +36,7 @@ function buildSequence(lap: TargetId[], n: number): TargetId[] {
 export const PATTERNS: Record<string, TestPattern> = {
   'sequential-1': {
     id: 'sequential-1',
+    version: 1, // 大きな変更があったら増やす
     name: {
       ja: '広域8点順番クリック',
       en: 'Wide 8-Point Sequence'

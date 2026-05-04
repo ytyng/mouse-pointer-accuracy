@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { resolve } from '$app/paths';
-  import { listPatterns } from '$lib/patterns';
+  import { getPattern, listPatterns } from '$lib/patterns';
   import { listResults, deleteResult, deleteResults, clearAll } from '$lib/storage';
   import {
     toJSON,
@@ -19,6 +19,13 @@
   const { _, lang } = i18nKit();
 
   const patterns = listPatterns();
+
+  // patternId からマスターデータの name (現在ロケール) に変換する。
+  // パターンがマスターから消えた場合は patternId をフォールバック表示。
+  function patternNameOf(id: string): string {
+    const p = getPattern(id);
+    return p ? _(p.name.ja, p.name.en) : id;
+  }
   let results = $state<TestResult[]>([]);
   let selectedPatternFilter = $state<string>('all');
 
@@ -220,7 +227,7 @@
             {#each filteredResults as r (r.id)}
               <tr class="border-b border-slate-100">
                 <td class="py-2 pr-3 font-medium">{r.name}</td>
-                <td class="py-2 pr-3 text-slate-600">{r.patternName}</td>
+                <td class="py-2 pr-3 text-slate-600">{patternNameOf(r.patternId)}</td>
                 <td class="py-2 pr-3 text-right tabular-nums font-semibold text-emerald-700"
                   >{r.score?.toFixed(2) ?? '-'}</td
                 >
@@ -238,28 +245,28 @@
                   <div class="flex gap-1 justify-end">
                     <button
                       onclick={() => exportSingle(r, 'json')}
-                      title="Export JSON"
+                      title={_('JSON でエクスポート', 'Export JSON')}
                       class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
                     >
                       <i class="bi bi-filetype-json"></i> JSON
                     </button>
                     <button
                       onclick={() => exportSingle(r, 'tsv')}
-                      title="Export TSV"
+                      title={_('TSV でエクスポート', 'Export TSV')}
                       class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
                     >
                       <i class="bi bi-table"></i> TSV
                     </button>
                     <button
                       onclick={() => exportSingle(r, 'md')}
-                      title="Export Markdown"
+                      title={_('Markdown でエクスポート', 'Export Markdown')}
                       class="text-xs px-2 py-1 border border-slate-300 rounded hover:bg-slate-100 inline-flex items-center gap-1"
                     >
                       <i class="bi bi-filetype-md"></i> MD
                     </button>
                     <button
                       onclick={() => onDelete(r.id, r.name)}
-                      title="Delete"
+                      title={_('削除', 'Delete')}
                       class="text-xs px-2 py-1 border border-red-300 text-red-600 rounded hover:bg-red-50 inline-flex items-center gap-1"
                     >
                       <i class="bi bi-trash3"></i>

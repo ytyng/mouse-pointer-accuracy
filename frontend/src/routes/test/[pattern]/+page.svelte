@@ -267,7 +267,7 @@
       id: summaryId,
       name: recordName.trim() || `unnamed-${summaryCreatedAt}`,
       patternId: pattern.id,
-      patternName: _(pattern.name.ja, pattern.name.en),
+      patternVersion: pattern.version,
       createdAt: summaryCreatedAt,
       totalMs,
       totalClicks: clicks.length,
@@ -275,8 +275,7 @@
       missClicks,
       missRate: missClicks / clicks.length,
       avgIntervalMs,
-      score: pattern.score(totalMs, missClicks),
-      clicks
+      score: pattern.score(totalMs, missClicks)
     };
   });
 

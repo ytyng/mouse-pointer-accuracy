@@ -3,21 +3,9 @@ import { i18nKit } from './i18n';
 
 const KEY = 'mpa.results.v1';
 
-function isValidClick(c: unknown): boolean {
-  if (!c || typeof c !== 'object') return false;
-  const o = c as Record<string, unknown>;
-  return (
-    typeof o.targetId === 'number' &&
-    typeof o.clickedX === 'number' &&
-    typeof o.clickedY === 'number' &&
-    typeof o.expectedX === 'number' &&
-    typeof o.expectedY === 'number' &&
-    typeof o.hit === 'boolean' &&
-    typeof o.tSinceStart === 'number' &&
-    typeof o.tSincePrev === 'number'
-  );
-}
-
+// サマリーレコードの最低限の整合性を確認する。
+// 過去バージョンで保存された patternName / clicks 等の余分なフィールドが含まれていても
+// 現行コードからは無視される (TestResult の型では未定義)。
 function isValidResult(r: unknown): r is TestResult {
   if (!r || typeof r !== 'object') return false;
   const o = r as Record<string, unknown>;
@@ -25,22 +13,20 @@ function isValidResult(r: unknown): r is TestResult {
     typeof o.id !== 'string' ||
     typeof o.name !== 'string' ||
     typeof o.patternId !== 'string' ||
-    typeof o.patternName !== 'string' ||
+    typeof o.patternVersion !== 'number' ||
     typeof o.createdAt !== 'string' ||
     typeof o.totalMs !== 'number' ||
     typeof o.totalClicks !== 'number' ||
     typeof o.hitClicks !== 'number' ||
     typeof o.missClicks !== 'number' ||
     typeof o.missRate !== 'number' ||
-    typeof o.avgIntervalMs !== 'number' ||
-    !Array.isArray(o.clicks)
+    typeof o.avgIntervalMs !== 'number'
   ) {
     return false;
   }
   // score は optional なので、存在する場合のみ number チェック
   if (o.score !== undefined && typeof o.score !== 'number') return false;
-  // clicks の各要素も型を検証 (export 時の .toFixed() 等で throw しないため)
-  return o.clicks.every(isValidClick);
+  return true;
 }
 
 function read(): TestResult[] {
