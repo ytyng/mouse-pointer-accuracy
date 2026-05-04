@@ -44,7 +44,9 @@ cd frontend
 npx -y pnpm@10 install --frozen-lockfile
 npx -y pnpm@10 run build
 
-# Build Output API は repo root の .vercel/output/ を要求する
+# Build Output API は repo root の .vercel/output/ を要求する。
+# 同一ワークスペースで再ビルドされる場合に備えて、既存の output を削除してから移動 (冪等化)。
 cd ..
 mkdir -p .vercel
+rm -rf .vercel/output
 mv frontend/.vercel/output .vercel/output

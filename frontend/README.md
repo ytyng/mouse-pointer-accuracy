@@ -42,7 +42,7 @@ pnpm format   # prettier --write (整形)
 
 - **Root Directory**: (デフォルト = repo root)
 - **Framework Preset**: Other (vercel.json で全て制御するため)
-- **Node.js Version**: 22.x
+- **Node.js Version**: 22.13 以上 (`package.json` の `engines.node` と一致)
 - **Environment Variables**:
   - `GITHUB_PAT`: cyberneura/svelteutils を clone できる Fine-grained PAT
     (`Contents: Read` 権限)。
