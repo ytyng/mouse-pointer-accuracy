@@ -36,8 +36,9 @@ export GIT_ASKPASS="${ASKPASS_SCRIPT}"
 export GIT_TERMINAL_PROMPT=0
 
 # .gitmodules の URL は変えず、askpass 経由で認証
-git submodule sync
-git submodule update --init
+# --recursive で将来 svelteutils 側にネストした submodule が増えても対応する
+git submodule sync --recursive
+git submodule update --init --recursive
 
 cd frontend
 npx -y pnpm@10 install --frozen-lockfile

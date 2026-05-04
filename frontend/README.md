@@ -55,7 +55,7 @@ repo root の `vercel.json` で `buildCommand` を `frontend/sh/build-for-vercel
 
 1. repo root に移動して `GIT_ASKPASS` 経由で `GITHUB_PAT` を git に渡す
    (URL に PAT を埋め込まないことでログ漏洩を防ぐ)。
-2. `git submodule update --init` で svelteutils を clone。
+2. `git submodule update --init --recursive` で svelteutils を clone。
 3. `frontend/` で `pnpm install --frozen-lockfile` + `pnpm build`。
 4. `frontend/.vercel/output` を repo root の `.vercel/output` に移動
    (Vercel Build Output API の要求)。
