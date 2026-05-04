@@ -27,6 +27,14 @@ pnpm preview  # production build をローカルで確認
 ## チェック
 
 ```sh
-pnpm check  # svelte-check (型チェック)
-pnpm lint   # eslint
+pnpm check    # svelte-check (型チェック)
+pnpm lint     # prettier --check + eslint
+pnpm format   # prettier --write (整形)
 ```
+
+## メモ
+
+- `prettier-plugin-tailwindcss` は今回入れていない。
+  `prettier-plugin-svelte` 3.5.x と組み合わさると `+page.svelte` で
+  "TypeError: getVisitorKeys is not a function" のフォーマット失敗が発生するため。
+  Tailwind クラスの自動ソートが必要になり、互換性のあるバージョンが揃った時点で再導入する。
