@@ -42,7 +42,7 @@ export const PATTERNS: Record<string, TestPattern> = {
       en: 'Wide 8-Point Sequence'
     },
     description: {
-      ja: 'ブラウザウィンドウの四隅とその間に設定された8点を、決まった順番に3週クリックするテスト。HDMIディスプレイでブラウザウインドウを最大化してください。',
+      ja: 'ブラウザウィンドウの四隅とその間に設定された8点を、決まった順番に3周クリックするテスト。HDMIディスプレイでブラウザウインドウを最大化してください。',
       en: 'A test to click 8 targets arranged in and around the corners of the browser window in a fixed order for 3 laps. Please maximize the browser window on an HDMI display.'
     },
     workWidth: W,
