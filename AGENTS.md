@@ -1,113 +1,113 @@
 # AGENTS.md
 
-このファイルは AI コーディングエージェント (Claude Code 等) が参照するためのガイド。
-人間向けプロジェクト概要は [`README.md`](./README.md) を参照。
+This file is a guide for AI coding agents (Claude Code, etc.).
+For a project overview aimed at humans, see [`README.md`](./README.md).
 
-## プロジェクト概要
+## Project Overview
 
-マウスポインタの精度・速度を計測する SvelteKit 製の Web アプリ。
-完全クライアントサイド (`ssr = false`)、データは `localStorage` に保存。Vercel にデプロイする。
+A SvelteKit web app that measures mouse pointer accuracy and speed.
+It is fully client-side (`ssr = false`), and data is stored in `localStorage`. It is deployed to Vercel.
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 mouse-pointer-accuracy/
-├── AGENTS.md                          このファイル (CLAUDE.md からシンボリックリンク)
+├── AGENTS.md                          This file (symlinked from CLAUDE.md)
 ├── CLAUDE.md → AGENTS.md
-├── README.md                          ユーザー向け概要
-├── vercel.json                        Vercel build 設定 (repo root)
-├── .gitmodules                        svelteutils サブモジュール定義
+├── README.md                          User-facing overview
+├── vercel.json                        Vercel build settings (repo root)
+├── .gitmodules                        svelteutils submodule definition
 └── frontend/
     ├── package.json
     ├── svelte.config.js               adapter-vercel
     ├── vite.config.ts
-    ├── tsconfig.json                  svelteutils を型チェック対象から除外
-    ├── eslint.config.js               prettier 統合
-    ├── .prettierrc                    pop-three / domainhike 準拠
-    ├── README.md                      frontend 個別ドキュメント
+    ├── tsconfig.json                  Excludes svelteutils from type checking
+    ├── eslint.config.js               prettier integration
+    ├── .prettierrc                    Follows pop-three / domainhike
+    ├── README.md                      frontend-specific documentation
     ├── sh/
-    │   └── build-for-vercel.sh        Vercel ビルドスクリプト (PAT で submodule 取得)
+    │   └── build-for-vercel.sh        Vercel build script (fetches the submodule with a PAT)
     └── src/
-        ├── app.html                   HTML シェル + Bootstrap Icons CDN
+        ├── app.html                   HTML shell + Bootstrap Icons CDN
         ├── app.d.ts
         ├── lib/
         │   ├── types.ts               TestPattern / TestResult / Target / ClickEvent
-        │   ├── patterns.ts            PATTERNS 定数 + getPattern / listPatterns
-        │   ├── storage.ts             localStorage 読み書きと validation
-        │   ├── export.ts              JSON / TSV / Markdown エクスポート
-        │   ├── i18n.ts                i18nKit (svelteutils ラッパー)
+        │   ├── patterns.ts            PATTERNS constant + getPattern / listPatterns
+        │   ├── storage.ts             localStorage read/write and validation
+        │   ├── export.ts              JSON / TSV / Markdown export
+        │   ├── i18n.ts                i18nKit (svelteutils wrapper)
         │   └── svelteutils/           git submodule (cyberneura/svelteutils, private)
         └── routes/
             ├── +layout.svelte
             ├── +layout.ts             ssr = false
             ├── layout.css             Tailwind import
-            ├── +page.svelte           ホーム (パターン一覧 + 記録一覧)
-            └── test/[pattern]/+page.svelte   計測ページ
+            ├── +page.svelte           Home (pattern list + result list)
+            └── test/[pattern]/+page.svelte   Measurement page
 ```
 
-## 技術スタック
+## Tech Stack
 
-- **SvelteKit 2** + **Svelte 5** (runes mode 強制)
+- **SvelteKit 2** + **Svelte 5** (runes mode enforced)
 - **TypeScript** (strict)
 - **Tailwind CSS 4**
 - **Bootstrap Icons 1.11** (CDN)
 - **adapter-vercel** (`@sveltejs/adapter-vercel`)
-- **pnpm** (lockfile 必須、Node `>=22.13.0`)
-- **prettier** + **eslint** (フォーマット + lint)
+- **pnpm** (lockfile required, Node `>=22.13.0`)
+- **prettier** + **eslint** (formatting + lint)
 
-> SvelteKit 2 / Svelte 5 (runes) は破壊的変更が多い世代。
-> API を確認したいときは **context7 MCP** で最新ドキュメントを取得する。
-> 例: `mcp__context7__resolve-library-id` → `mcp__context7__get-library-docs`
-> ライブラリ ID: `/sveltejs/svelte`, `/sveltejs/kit`
+> SvelteKit 2 / Svelte 5 (runes) is a generation with many breaking changes.
+> When you want to check an API, fetch the latest documentation with the **context7 MCP**.
+> Example: `mcp__context7__resolve-library-id` → `mcp__context7__get-library-docs`
+> Library IDs: `/sveltejs/svelte`, `/sveltejs/kit`
 
-## 開発フロー
+## Development Flow
 
-### 初回セットアップ
+### Initial setup
 
 ```sh
-# submodule 取得 (private repo: cyberneura/svelteutils)
+# Fetch the submodule (private repo: cyberneura/svelteutils)
 git submodule update --init --recursive
 
 cd frontend
 pnpm install
 ```
 
-### 日常コマンド
+### Everyday commands
 
 ```sh
 cd frontend
-pnpm dev         # 開発サーバー (http://localhost:5173)
-pnpm build       # 本番ビルド (Vercel adapter)
-pnpm preview     # 本番ビルドをローカル確認
-pnpm check       # svelte-check (型チェック)
+pnpm dev         # Development server (http://localhost:5173)
+pnpm build       # Production build (Vercel adapter)
+pnpm preview     # Check the production build locally
+pnpm check       # svelte-check (type checking)
 pnpm lint        # prettier --check + eslint
-pnpm format      # prettier --write (整形)
+pnpm format      # prettier --write (formatting)
 ```
 
-### ユニットテスト
+### Unit tests
 
-現時点でテストフレームワーク (vitest 等) は導入していない。
-追加時は context7 MCP で `/vitest-dev/vitest` の最新ドキュメントを参照する。
+No test framework (vitest, etc.) has been introduced yet.
+When adding one, consult the latest documentation for `/vitest-dev/vitest` with the context7 MCP.
 
-## 開発パターン
+## Development Patterns
 
-### i18n (日本語 / 英語)
+### i18n (Japanese / English)
 
-`i18nKit()` でロケールを取得し `_(ja, en)` で文字列を切り替える。
+Get the locale with `i18nKit()` and switch strings with `_(ja, en)`.
 
 ```ts
 import { i18nKit } from '$lib/i18n';
 const { _, lang } = i18nKit();
-// _(ja, en) でブラウザ言語に応じた文字列
+// _(ja, en) gives the string for the browser language
 ```
 
-ブラウザ言語は `navigator.language` から自動判定、`+layout.ts` で `ssr = false` を設定して
-ハイドレーション不整合を回避している。
+The browser language is detected automatically from `navigator.language`, and `ssr = false` is set in `+layout.ts`
+to avoid hydration mismatches.
 
 ### TestPattern
 
-`src/lib/patterns.ts` の `PATTERNS` 定数に追加する。`name` / `description` /
-`scoreFormula` は `{ ja, en }` 構造、`version` (number) は仕様変更時に増やす。
+Add patterns to the `PATTERNS` constant in `src/lib/patterns.ts`. `name` / `description` /
+`scoreFormula` have a `{ ja, en }` structure, and `version` (number) is incremented when the specification changes.
 
 ```ts
 'pattern-id': {
@@ -123,83 +123,83 @@ const { _, lang } = i18nKit();
 }
 ```
 
-### TestResult (localStorage 保存形式)
+### TestResult (localStorage storage format)
 
-サマリーのみ保存。クリック詳細 (`ClickEvent[]`) や `patternName` は保存しない。
-表示・エクスポート時に `patternId` から `getPattern(id).name` で都度解決する。
-`patternVersion` を保持しているので、後でマスター仕様が上がっても旧記録の取得条件が分かる。
+Only the summary is stored. Click details (`ClickEvent[]`) and `patternName` are not stored.
+When displaying or exporting, the name is resolved each time from `patternId` with `getPattern(id).name`.
+Because `patternVersion` is kept, the conditions under which an old record was taken are still known even if the master specification is bumped later.
 
-### バリデーション
+### Validation
 
-`storage.ts` の `isValidResult` で localStorage 読み込み時に型検証する。
-新フィールドを追加した場合は `isValidResult` も更新すること (旧データ互換に注意)。
+`isValidResult` in `storage.ts` validates types when reading from localStorage.
+When you add a new field, update `isValidResult` as well (be careful about compatibility with old data).
 
-## デプロイ (Vercel)
+## Deployment (Vercel)
 
-### Vercel 側設定
-- Root Directory: デフォルト (repo root)
+### Vercel-side settings
+- Root Directory: default (repo root)
 - Framework Preset: Other
-- Node.js Version: 22.13 以上
-- Environment Variables: `GITHUB_PAT` (cyberneura/svelteutils を Read できる Fine-grained PAT)
+- Node.js Version: 22.13 or higher
+- Environment Variables: `GITHUB_PAT` (a fine-grained PAT that can read cyberneura/svelteutils)
 
-### 仕組み
+### How it works
 
-repo root の `vercel.json` の `buildCommand` が `frontend/sh/build-for-vercel.sh` を呼び、
-スクリプトが下記を行う:
+The `buildCommand` in `vercel.json` at the repo root calls `frontend/sh/build-for-vercel.sh`,
+and the script does the following:
 
-1. `GIT_ASKPASS` 経由で `GITHUB_PAT` を git に渡す (URL に PAT を埋め込まない)
-2. `git submodule update --init --recursive` で svelteutils を clone
-3. `frontend/` で `pnpm install --frozen-lockfile` + `pnpm build`
-4. `frontend/.vercel/output` を repo root の `.vercel/output` に移動 (冪等)
+1. Passes `GITHUB_PAT` to git via `GIT_ASKPASS` (the PAT is not embedded in the URL)
+2. Clones svelteutils with `git submodule update --init --recursive`
+3. Runs `pnpm install --frozen-lockfile` + `pnpm build` in `frontend/`
+4. Moves `frontend/.vercel/output` to `.vercel/output` at the repo root (idempotent)
 
-詳細は `frontend/sh/build-for-vercel.sh` を参照。
+See `frontend/sh/build-for-vercel.sh` for details.
 
-## ワークフロー (推奨)
+## Workflow (recommended)
 
-### コード変更 → PR 作成 → マージまで
+### From code change → PR creation → merge
 
-1. ブランチを切る前に `git status` を確認
-2. 開発・修正を行う
-3. `pnpm check` / `pnpm lint` をパスさせる (push 前必須)
-4. **`/review-stage`** で staging 内容をセルフレビュー
-5. **`/feature-pr`** で feature ブランチ作成 → コミット → push → PR 作成
-6. **`/wait-copilot-review`** で Copilot レビューを待つ
-7. **`/review-pr-comment`** でレビューコメントへ対応
-8. レビューコメント対応 → 再 push → 再レビュー依頼 のサイクルを Copilot が `no new comments` を返すまで繰り返す
+1. Check `git status` before creating a branch
+2. Develop / fix
+3. Make `pnpm check` / `pnpm lint` pass (required before pushing)
+4. Self-review the staged changes with **`/review-stage`**
+5. Create a feature branch → commit → push → create a PR with **`/feature-pr`**
+6. Wait for the Copilot review with **`/wait-copilot-review`**
+7. Address review comments with **`/review-pr-comment`**
+8. Repeat the cycle of addressing review comments → pushing again → requesting another review until Copilot returns `no new comments`
 
-### コミットメッセージ
+### Commit messages
 
-- 関西弁不可、絵文字不可
-- Claude Code 署名 (Co-Authored-By 等) は入れない
-- メールは `t@ytyng.com`
+- No Kansai dialect, no emoji
+- Do not include Claude Code signatures (Co-Authored-By, etc.)
+- Use the email `t@ytyng.com`
 
 ### Prettier / ESLint
 
-- インデントは **スペース 2 つ** (`useTabs: false`)
-- Single quote / `trailingComma: 'none'` / `printWidth: 100`
-- `prettier-plugin-tailwindcss` は **入れない** (svelte plugin 3.5.x との互換性問題、
-  詳細は `frontend/README.md` の「メモ」を参照)
+- Indent with **2 spaces** (`useTabs: false`)
+- Single quotes / `trailingComma: 'none'` / `printWidth: 100`
+- **Do not add** `prettier-plugin-tailwindcss` (compatibility problems with svelte plugin 3.5.x;
+  see "Notes" in `frontend/README.md` for details)
 
-## 注意事項
+## Caveats
 
 ### svelteutils
 
-`src/lib/svelteutils/` は **private な git submodule** (cyberneura/svelteutils)。
-- `tsconfig.json` の `exclude` で型チェック対象から除外
-- `eslint.config.js` の `ignores` で lint 対象から除外
-- `.prettierignore` で format 対象から除外
-- Vercel ビルド時は `GITHUB_PAT` で clone
+`src/lib/svelteutils/` is a **private git submodule** (cyberneura/svelteutils).
+- Excluded from type checking via `exclude` in `tsconfig.json`
+- Excluded from lint via `ignores` in `eslint.config.js`
+- Excluded from formatting via `.prettierignore`
+- Cloned with `GITHUB_PAT` during the Vercel build
 
 ### ssr = false
 
-`+layout.ts` で `ssr = false` にしている。理由:
-- localStorage と navigator.language に依存するため
-- i18n がクライアント言語で完結するため
+`ssr = false` is set in `+layout.ts`. Reasons:
+- It depends on localStorage and navigator.language
+- i18n is resolved entirely from the client language
 
-SSR を有効化する変更は慎重に。`localStorage` 直接参照、`window` 参照などが各所にある。
+Be careful with any change that enables SSR. There are direct references to `localStorage`, `window`, and so on in various places.
 
 ### Modal a11y
 
-intro / pause modal は `+page.svelte` (test) のルートレベルに配置 (work area 外)。
-`role="dialog"` / `aria-modal` / `aria-labelledby` を付与し、`$effect` で主要ボタンに
-focus を移動している (focus trap までは実装していない)。
+The intro / pause modals are placed at the root level of `+page.svelte` (test) (outside the work area).
+They have `role="dialog"` / `aria-modal` / `aria-labelledby`, and `$effect` moves
+focus to the primary button (a focus trap is not implemented).
